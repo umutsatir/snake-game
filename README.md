@@ -1,6 +1,6 @@
 # Retro Snake Game
 
-A classic Snake game built with Python and PyGame for the SWE-2 university assignment.
+A classic Snake game built with Python and PyGame for the CSE444 assignment.
 
 ## Setup
 
