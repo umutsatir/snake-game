@@ -3,6 +3,7 @@ import pygame
 from src.enums import FoodType
 import config
 
+
 class Food:
     def __init__(self):
         self.position: tuple[int, int] = (0, 0)
@@ -37,3 +38,40 @@ class BonusFood(Food):
     def time_remaining_ms(self) -> int:
         elapsed = pygame.time.get_ticks() - self.spawn_time
         return max(0, self.duration_ms - elapsed)
+
+
+class SpecialFood(Food):
+    """Base for timed special-effect foods."""
+
+    def __init__(self, food_type: FoodType, points: int = 0):
+        super().__init__()
+        self.food_type = food_type
+        self.points = points
+        self.spawn_time: int = 0
+        self.duration_ms: int = config.SPECIAL_FOOD_DURATION_MS
+
+    def activate(self, occupied_set: set, cols: int, rows: int):
+        self.spawn_time = pygame.time.get_ticks()
+        self.randomize(occupied_set, cols, rows)
+
+    def is_expired(self) -> bool:
+        return pygame.time.get_ticks() - self.spawn_time > self.duration_ms
+
+    def time_remaining_ms(self) -> int:
+        elapsed = pygame.time.get_ticks() - self.spawn_time
+        return max(0, self.duration_ms - elapsed)
+
+
+class InvincibilityFood(SpecialFood):
+    def __init__(self):
+        super().__init__(FoodType.INVINCIBILITY, points=25)
+
+
+class PoisonFood(SpecialFood):
+    def __init__(self):
+        super().__init__(FoodType.POISON, points=0)
+
+
+class SlowMotionFood(SpecialFood):
+    def __init__(self):
+        super().__init__(FoodType.SLOW_MOTION, points=15)
