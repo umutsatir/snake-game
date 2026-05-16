@@ -30,12 +30,20 @@ class GameState(Enum):
 class FoodType(Enum):
     NORMAL = "normal"
     BONUS = "bonus"
+    INVINCIBILITY = "invincibility"
+    POISON = "poison"
+    SLOW_MOTION = "slow_motion"
 
 class Theme(Enum):
     CLASSIC = "classic"
     NEON = "neon"
     DESERT = "desert"
     OCEAN = "ocean"
+
+class Difficulty(Enum):
+    EASY = "easy"
+    NORMAL = "normal"
+    HARD = "hard"
 
 class InputAction(Enum):
     QUIT = "quit"
