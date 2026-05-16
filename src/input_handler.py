@@ -35,7 +35,10 @@ class InputHandler:
         return None
 
     def process_menu_event(self, event: pygame.event.Event) -> "InputAction | None":
-        """Process events in the menu — W toggles wraparound, LEFT/RIGHT cycle themes."""
+        """
+        Process events in the menu.
+        LEFT/RIGHT cycle themes; UP/DOWN cycle difficulty; W toggles wraparound.
+        """
         if event.type == pygame.QUIT:
             return InputAction.QUIT
         if event.type == pygame.KEYDOWN:
@@ -46,6 +49,10 @@ class InputHandler:
                 self.direction_buffer.append(Direction.LEFT)
             elif key == pygame.K_RIGHT or key == pygame.K_d:
                 self.direction_buffer.append(Direction.RIGHT)
+            elif key == pygame.K_UP:
+                self.direction_buffer.append(Direction.UP)
+            elif key == pygame.K_DOWN:
+                self.direction_buffer.append(Direction.DOWN)
             elif key == pygame.K_RETURN or key == pygame.K_KP_ENTER:
                 return InputAction.CONFIRM
             elif key == pygame.K_q or key == pygame.K_ESCAPE:
