@@ -7,19 +7,18 @@ import config
 
 def _generate_sound(sample_rate: int, frames: list[tuple[float, float, float]]) -> pygame.mixer.Sound:
     """
-    Build a pygame Sound from a list of (frequency_hz, duration_s, amplitude) segments.
-    Uses a simple sine wave with a short fade-out per segment to avoid clicks.
+    Build a pygame Sound from (frequency_hz, duration_s, amplitude) segments.
+    Sine wave with per-segment fade-out to avoid clicks.
     """
-    samples = array.array("h")  # signed 16-bit
+    samples = array.array("h")
     max_val = 32767
 
     for freq, duration, amplitude in frames:
         n = int(sample_rate * duration)
-        fade_samples = min(int(sample_rate * 0.01), n)  # 10 ms fade-out
+        fade_samples = min(int(sample_rate * 0.01), n)
         for i in range(n):
             t = i / sample_rate
             val = amplitude * math.sin(2 * math.pi * freq * t)
-            # fade out at the end of each segment
             if i >= n - fade_samples:
                 val *= (n - i) / fade_samples
             samples.append(int(val * max_val))
@@ -28,7 +27,6 @@ def _generate_sound(sample_rate: int, frames: list[tuple[float, float, float]]) 
 
 
 def _make_eat() -> pygame.mixer.Sound:
-    """Short upward chirp — classic 8-bit pickup blip."""
     rate = 44100
     return _generate_sound(rate, [
         (440, 0.04, 0.4),
@@ -37,7 +35,6 @@ def _make_eat() -> pygame.mixer.Sound:
 
 
 def _make_eat_bonus() -> pygame.mixer.Sound:
-    """Ascending arpeggio — brighter, longer reward sound."""
     rate = 44100
     return _generate_sound(rate, [
         (523, 0.06, 0.5),
@@ -48,13 +45,46 @@ def _make_eat_bonus() -> pygame.mixer.Sound:
 
 
 def _make_game_over() -> pygame.mixer.Sound:
-    """Descending tone — low and grim."""
     rate = 44100
     return _generate_sound(rate, [
         (330, 0.12, 0.6),
         (262, 0.12, 0.6),
         (196, 0.20, 0.6),
         (130, 0.25, 0.5),
+    ])
+
+
+def _make_eat_invincibility() -> pygame.mixer.Sound:
+    """Bright ascending arpeggio — magical power-up feel."""
+    rate = 44100
+    return _generate_sound(rate, [
+        (523, 0.05, 0.4),
+        (659, 0.05, 0.4),
+        (880, 0.05, 0.4),
+        (1047, 0.05, 0.4),
+        (1319, 0.10, 0.45),
+    ])
+
+
+def _make_eat_poison() -> pygame.mixer.Sound:
+    """Descending dissonant tones — ominous/sour."""
+    rate = 44100
+    return _generate_sound(rate, [
+        (300, 0.08, 0.5),
+        (220, 0.08, 0.5),
+        (150, 0.12, 0.5),
+        (100, 0.18, 0.4),
+    ])
+
+
+def _make_eat_slow_motion() -> pygame.mixer.Sound:
+    """Dreamy, slowly bending note."""
+    rate = 44100
+    return _generate_sound(rate, [
+        (440, 0.12, 0.35),
+        (415, 0.12, 0.35),
+        (392, 0.16, 0.35),
+        (370, 0.20, 0.30),
     ])
 
 
@@ -71,11 +101,13 @@ class SoundManager:
             self.enabled = False
             return
 
-        # Try loading from files first; fall back to procedural generation.
         generators = {
             "eat": _make_eat,
             "eat_bonus": _make_eat_bonus,
             "game_over": _make_game_over,
+            "eat_invincibility": _make_eat_invincibility,
+            "eat_poison": _make_eat_poison,
+            "eat_slow_motion": _make_eat_slow_motion,
         }
         for name, make_fn in generators.items():
             path = os.path.join(config.SOUND_DIR, f"{name}.wav")
